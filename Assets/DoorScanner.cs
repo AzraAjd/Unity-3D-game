@@ -30,7 +30,6 @@ public class DoorScanner : MonoBehaviour
             rightDoorAnimation = rightDoor.GetComponent<Animation>();
             leftDoorAnimation = leftDoor.GetComponent<Animation>();
 
-            Debug.Log("the animation will play now");
             rightDoorAnimation.Play("right_door");
             leftDoorAnimation.Play("left_door");
 
