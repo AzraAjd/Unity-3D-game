@@ -9,10 +9,14 @@ public class displayUI : MonoBehaviour
     public bool displayInfo;
     public float fadeTime;
 
+    private pickup_controller pickupCtrl;
+
     void Start()
     {
         myText = GameObject.Find(this.name + "/Canvas/Text").GetComponent<Text>();
         myText.color = Color.clear;
+        pickupCtrl = GameObject.Find("Player").GetComponent<pickup_controller>();
+
     }
 
     // Update is called once per frame
@@ -24,8 +28,11 @@ public class displayUI : MonoBehaviour
 
     void OnMouseOver()
     {
-        displayInfo = true;
-        
+        if (!pickupCtrl.carrying)
+        {
+            displayInfo = true;
+        }
+        else return;
     }
 
     void OnMouseExit()

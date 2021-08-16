@@ -2,27 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class pickup_controller : MonoBehaviour   
+public class pickup_controller : MonoBehaviour
 {
     //GameObject mainCamera;
-    bool carrying;
+    public bool carrying;
     GameObject carriedObject;
     Camera mainCam;
+    public float smooth;
     public float distance;
     int x;
     int y;
 
-    float smooth = 5.0f;
-    float tiltAngle = 60.0f;
-
-
     // Start is called before the first frame update
     void Start()
     {
-        //mainCamera = GameObject.FindWithTag("MainCamera");
+        carrying = false;
         mainCam = Camera.main;
-        x = Screen.width / 2;
-        y = Screen.height / 2;
+        x = Screen.width/2;
+        y = Screen.height/2;
 
     }
 
@@ -31,25 +28,32 @@ public class pickup_controller : MonoBehaviour
     {
         if (carrying)
         {
-            carry(carriedObject);
-            checkDrop();
-        }  
+            Carry(carriedObject);
+            rotateObject();
+            CheckDrop();
+        }
         else
-            pickup();
+            Pickup();
     }
 
-    void carry (GameObject o)
+    void rotateObject()
     {
-       o.transform.position = mainCam.transform.position + mainCam.transform.forward * distance;
+        carriedObject.transform.Rotate(5, 10, 15);
+    }
+    void Carry(GameObject o)
+    {
+        Debug.Log(o.name);
+        o.transform.position = Vector3.Lerp(o.transform.position, mainCam.transform.position + mainCam.transform.forward * distance, Time.deltaTime * smooth);
+        o.transform.rotation = Quaternion.identity;
     }
 
-    void pickup()
+    void Pickup()
     {
-        if (Input.GetKeyDown(KeyCode.E)){
-
+        if (Input.GetKeyDown(KeyCode.E))
+        {
             Ray ray = mainCam.ScreenPointToRay(new Vector3(x, y));
             RaycastHit hit;
-            if(Physics.Raycast(ray, out hit))
+            if (Physics.Raycast(ray, out hit))
             {
                 string tag = hit.collider.tag;
                 Debug.Log(tag);
@@ -58,34 +62,25 @@ public class pickup_controller : MonoBehaviour
                 {
                     carrying = true;
                     carriedObject = p.gameObject;
-                    p.gameObject.GetComponent<Rigidbody>().isKinematic = true;
-                    //p.transform.Rotate(90.0f, 0, 0, Space.Self);
-                    // p.transform.rotation = mainCam.transform.rotation;
-
-                    /*p.transform.LookAt(mainCam.transform.position);
-                    var rot = transform.rotation.eulerAngles;
-                    p.transform.rotation = Quaternion.Euler(rot.x, rot.y, 0);*/
-
+                    p.gameObject.GetComponent<Rigidbody>().useGravity = false;
+                    p.gameObject.GetComponent<displayUI>().displayInfo = false;
                 }
-
-               
             }
         }
     }
 
-    void checkDrop()
+    void CheckDrop()
     {
-        if (Input.GetKeyDown (KeyCode.E))
+        if (Input.GetKeyDown(KeyCode.E))
         {
-            dropObject();
+            DropObject();
         }
     }
 
-    void dropObject()
+    void DropObject()
     {
         carrying = false;
-        carriedObject.gameObject.GetComponent<Rigidbody>().isKinematic = false;
-       //carriedObject.transform.Rotate(-90.0f, 0, 0, Space.Self);
+        carriedObject.gameObject.GetComponent<Rigidbody>().useGravity = true;
         carriedObject = null;
     }
 }
